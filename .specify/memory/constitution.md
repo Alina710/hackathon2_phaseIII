@@ -1,18 +1,13 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version change: 0.0.0 → 1.0.0 (Initial ratification)
-Modified principles: N/A (new constitution)
+Version change: 1.0.0 → 1.1.0 (MINOR: Phase II technology matrix expansion)
+Modified principles:
+  - IV. Technology Constraints → expanded with phase-specific technology matrix
 Added sections:
-  - I. Spec-Driven Development
-  - II. Agent Behavior Rules
-  - III. Phase Governance
-  - IV. Technology Constraints
-  - V. Quality Principles
-  - Technology Stack (detailed)
-  - Development Workflow
-  - Governance
-Removed sections: N/A
+  - Phase-Specific Technology Matrix (detailed breakdown by phase)
+  - Phase II Technology Details (Backend, Database, Frontend, Authentication)
+Removed sections: None
 Templates requiring updates:
   - .specify/templates/plan-template.md ✅ (compatible, references Constitution Check)
   - .specify/templates/spec-template.md ✅ (compatible)
@@ -77,8 +72,8 @@ The Evolution of Todo project is organized into five distinct phases. Each phase
 immutable boundaries defined by its specification.
 
 **Phase Definitions**:
-- **Phase I**: Foundation - Core todo CRUD, local persistence
-- **Phase II**: API Layer - REST API, database integration
+- **Phase I**: Foundation - In-memory console application ONLY (no persistence, no web, no auth)
+- **Phase II**: Full-Stack Web - Python REST API, Neon PostgreSQL, Next.js frontend, Better Auth
 - **Phase III**: Intelligence - AI agents, natural language processing
 - **Phase IV**: Distribution - Multi-service architecture, event-driven
 - **Phase V**: Scale - Kubernetes orchestration, observability, multi-tenancy
@@ -105,30 +100,81 @@ is stable before adding additional capabilities. Scope creep across phases is pr
 The following technology stack is mandated for the Evolution of Todo project.
 Deviations require an approved ADR (Architecture Decision Record) and constitution amendment.
 
-**Backend (All Phases)**:
+#### Phase I: In-Memory Console Application
+
+**Allowed Technologies**:
 - Language: Python 3.11+
-- Framework: FastAPI
-- ORM: SQLModel
-- Database: Neon DB (PostgreSQL)
-- Validation: Pydantic
+- Storage: In-memory only (no database, no file persistence)
+- Interface: Command-line console only
+- Validation: Basic Python data structures (dataclasses, typing)
 
-**Frontend (Phase III+)**:
-- Framework: Next.js 14+
-- Language: TypeScript
-- State Management: React Server Components / Context API
+**Prohibited in Phase I**:
+- Web frameworks (Flask, FastAPI, Django, etc.)
+- Databases (PostgreSQL, SQLite, etc.)
+- ORMs (SQLModel, SQLAlchemy, etc.)
+- Web frontends (React, Next.js, etc.)
+- Authentication systems
+- External APIs
 
-**AI/Agents (Phase III+)**:
+**Rationale**: Phase I establishes core todo logic in isolation before adding infrastructure.
+
+#### Phase II: Full-Stack Web Application
+
+**Backend**:
+- Language: Python 3.11+
+- Framework: FastAPI (Python REST API)
+- ORM: SQLModel (or equivalent SQLAlchemy-based)
+- Validation: Pydantic v2
+
+**Database**:
+- Provider: Neon Serverless PostgreSQL
+- Protocol: PostgreSQL wire protocol
+- Migrations: Alembic or SQLModel migrations
+
+**Frontend**:
+- Framework: Next.js 14+ (App Router)
+- Language: TypeScript (strict mode)
+- UI: React Server Components / Client Components as appropriate
+- State Management: React Context API or Server Actions
+
+**Authentication**:
+- Provider: Better Auth
+- Features: Signup, Signin, Session management
+- Security: HTTPS-only, secure cookies, CSRF protection
+
+**Allowed Starting Phase II**:
+- Web frontend (Next.js)
+- REST API endpoints
+- Neon PostgreSQL database
+- User authentication (Better Auth)
+- Session management
+
+**Prohibited Until Phase III**:
+- AI/ML frameworks (OpenAI SDK, LangChain, etc.)
+- Agent frameworks (AutoGPT, CrewAI, etc.)
+- Natural language processing
+- Model Context Protocol (MCP)
+
+**Rationale**: Phase II adds proper persistence and web interface while deferring AI capabilities.
+
+#### Phase III+: Intelligence, Distribution, Scale
+
+**AI/Agents (Phase III)**:
 - SDK: OpenAI Agents SDK
 - Protocol: Model Context Protocol (MCP)
 - Tool Framework: Function calling with structured outputs
 
-**Infrastructure (Phase IV+)**:
+**Infrastructure (Phase IV)**:
 - Containerization: Docker
-- Orchestration: Kubernetes
 - Messaging: Apache Kafka
 - Sidecar Runtime: Dapr
 
-**Non-Negotiable Constraints**:
+**Orchestration (Phase V)**:
+- Orchestration: Kubernetes
+- Observability: OpenTelemetry
+- Multi-tenancy: Namespace isolation
+
+**Non-Negotiable Constraints (All Phases)**:
 - All services MUST be stateless (state in database or message broker only)
 - All APIs MUST be versioned (URL path versioning: /v1/, /v2/)
 - All secrets MUST use environment variables (never hardcoded)
@@ -176,13 +222,26 @@ system remains maintainable as it evolves through all five phases.
 
 ## Technology Stack Summary
 
+### Phase-Specific Technology Matrix
+
+| Phase | Architecture | Backend | Database | Frontend | Auth | AI/Agents |
+|-------|-------------|---------|----------|----------|------|-----------|
+| I     | Console App | Python 3.11+ | In-memory | None | None | None |
+| II    | Full-Stack Web | FastAPI + SQLModel | Neon PostgreSQL | Next.js + TypeScript | Better Auth | None |
+| III   | Intelligent Web | FastAPI + SQLModel | Neon PostgreSQL | Next.js + TypeScript | Better Auth | OpenAI SDK + MCP |
+| IV    | Distributed | FastAPI + Kafka + Dapr | Neon PostgreSQL | Next.js + TypeScript | Better Auth | OpenAI SDK + MCP |
+| V     | Kubernetes Scale | FastAPI + K8s | Neon PostgreSQL | Next.js + TypeScript | Better Auth | OpenAI SDK + MCP |
+
+### Detailed Technology Stack
+
 | Layer          | Technology                | Phase Introduced |
 |----------------|---------------------------|------------------|
 | Language       | Python 3.11+              | I                |
 | API Framework  | FastAPI                   | II               |
 | ORM            | SQLModel                  | II               |
-| Database       | Neon DB (PostgreSQL)      | II               |
-| Frontend       | Next.js + TypeScript      | III              |
+| Database       | Neon PostgreSQL           | II               |
+| Frontend       | Next.js + TypeScript      | II               |
+| Authentication | Better Auth               | II               |
 | AI SDK         | OpenAI Agents SDK         | III              |
 | Protocol       | MCP                       | III              |
 | Containers     | Docker                    | IV               |
@@ -255,4 +314,4 @@ All development MUST follow this workflow without exception:
 This constitution supersedes all other project documentation in case of conflict.
 Agent instructions, team conventions, and external guidelines yield to this document.
 
-**Version**: 1.0.0 | **Ratified**: 2025-12-28 | **Last Amended**: 2025-12-28
+**Version**: 1.1.0 | **Ratified**: 2025-12-28 | **Last Amended**: 2025-12-29
