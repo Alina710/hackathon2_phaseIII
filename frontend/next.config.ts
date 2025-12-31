@@ -12,11 +12,6 @@ const nextConfig: NextConfig = {
   // Output configuration for Vercel
   output: 'standalone',
 
-  // Disable ESLint during builds to speed up
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-
   // Disable TypeScript errors during build (optional - remove if you want strict checking)
   typescript: {
     ignoreBuildErrors: true,

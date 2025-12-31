@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useTodos } from "@/hooks/useTodos";
@@ -17,7 +17,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { Todo, type Priority, type Category } from "@/lib/types";
 import { VIEW_MODES, type ViewMode } from "@/lib/constants";
 
-export default function TodosPage() {
+function TodosPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, signout, isLoading: authLoading, isMounted } = useAuth();
@@ -367,5 +367,17 @@ export default function TodosPage() {
         todoTitle={deleteModalTodo?.title || ""}
       />
     </div>
+  );
+}
+
+export default function TodosPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse text-gray-500">Loading...</div>
+      </div>
+    }>
+      <TodosPageContent />
+    </Suspense>
   );
 }
