@@ -9,8 +9,15 @@ interface UseTodosReturn {
   total: number;
   isLoading: boolean;
   error: string | null;
-  fetchTodos: () => Promise<void>;
-  createTodo: (title: string) => Promise<Todo>;
+  fetchTodos: (filters?: {
+    search?: string;
+    status?: string;
+    priority?: string;
+    category?: string;
+    sort_by?: string;
+    sort_order?: string;
+  }) => Promise<void>;
+  createTodo: (data: CreateTodoRequest) => Promise<Todo>;
   updateTodo: (id: string, data: UpdateTodoRequest) => Promise<Todo>;
   toggleTodo: (id: string) => Promise<Todo>;
   deleteTodo: (id: string) => Promise<void>;
@@ -22,11 +29,31 @@ export function useTodos(): UseTodosReturn {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchTodos = useCallback(async () => {
+  const fetchTodos = useCallback(async (filters?: {
+    search?: string;
+    status?: string;
+    priority?: string;
+    category?: string;
+    sort_by?: string;
+    sort_order?: string;
+  }) => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await api.get<TodoListResponse>("/todos");
+
+      // Build query params
+      const params = new URLSearchParams();
+      if (filters?.search) params.append("search", filters.search);
+      if (filters?.status) params.append("status", filters.status);
+      if (filters?.priority) params.append("priority", filters.priority);
+      if (filters?.category) params.append("category", filters.category);
+      if (filters?.sort_by) params.append("sort_by", filters.sort_by);
+      if (filters?.sort_order) params.append("sort_order", filters.sort_order);
+
+      const queryString = params.toString();
+      const endpoint = queryString ? `/todos?${queryString}` : "/todos";
+
+      const response = await api.get<TodoListResponse>(endpoint);
       setTodos(response.todos);
       setTotal(response.total);
     } catch (err) {
@@ -44,10 +71,16 @@ export function useTodos(): UseTodosReturn {
     fetchTodos();
   }, [fetchTodos]);
 
-  const createTodo = async (title: string): Promise<Todo> => {
+  const createTodo = async (data: any): Promise<Todo> => {
     try {
       setError(null);
-      const todo = await api.post<Todo>("/todos", { title } as CreateTodoRequest);
+      // Convert string priority to proper Priority type
+      const createData = {
+        ...data,
+        priority: data.priority || "medium" as "high" | "medium" | "low",
+        category: data.category || "personal",
+      };
+      const todo = await api.post<Todo>("/todos", createData);
       setTodos((prev) => [todo, ...prev]);
       setTotal((prev) => prev + 1);
       return todo;

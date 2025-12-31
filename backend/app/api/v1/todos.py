@@ -1,7 +1,8 @@
 """Todo endpoints per contracts/api.md."""
 
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session
 
 from app.db.session import get_session
@@ -23,10 +24,24 @@ router = APIRouter(prefix="/todos", tags=["todos"])
 def list_todos(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
+    search: Optional[str] = Query(None, description="Search in title and description"),
+    status: Optional[str] = Query(None, description="Filter by status (completed/pending)"),
+    priority: Optional[str] = Query(None, description="Filter by priority (high/medium/low)"),
+    category: Optional[str] = Query(None, description="Filter by category"),
+    sort_by: Optional[str] = Query("created_at", description="Sort field (created_at, due_date, priority)"),
+    sort_order: Optional[str] = Query("desc", description="Sort order (asc/desc)"),
 ):
-    """List all todos for the current user."""
+    """List all todos for the current user with filtering and sorting."""
     todo_service = TodoService(session)
-    todos = todo_service.list_todos(current_user.id)
+    todos = todo_service.list_todos_filtered(
+        user_id=current_user.id,
+        search=search,
+        status=status,
+        priority=priority,
+        category=category,
+        sort_by=sort_by,
+        sort_order=sort_order,
+    )
 
     return TodoListResponse(
         todos=[TodoResponse.model_validate(t) for t in todos],
@@ -47,6 +62,13 @@ def create_todo(
         todo = todo_service.create_todo(
             title=todo_data.title,
             user_id=current_user.id,
+            description=todo_data.description,
+            priority=todo_data.priority,
+            category=todo_data.category,
+            due_date=todo_data.due_date,
+            is_recurring=todo_data.is_recurring,
+            recurring_frequency=todo_data.recurring_frequency,
+            reminder_time=todo_data.reminder_time,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -78,7 +100,7 @@ def update_todo(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    """Update a todo (title or completion status)."""
+    """Update a todo (any field)."""
     todo_service = TodoService(session)
 
     try:
@@ -87,6 +109,13 @@ def update_todo(
             user_id=current_user.id,
             title=todo_data.title,
             completed=todo_data.completed,
+            description=todo_data.description,
+            priority=todo_data.priority,
+            category=todo_data.category,
+            due_date=todo_data.due_date,
+            is_recurring=todo_data.is_recurring,
+            recurring_frequency=todo_data.recurring_frequency,
+            reminder_time=todo_data.reminder_time,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
