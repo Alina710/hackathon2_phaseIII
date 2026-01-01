@@ -9,9 +9,6 @@ const nextConfig: NextConfig = {
     unoptimized: true, // Disable image optimization for faster builds
   },
 
-  // Output configuration for Vercel
-  output: 'standalone',
-
   // Disable TypeScript errors during build (optional - remove if you want strict checking)
   typescript: {
     ignoreBuildErrors: true,
