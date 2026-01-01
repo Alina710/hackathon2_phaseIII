@@ -7,7 +7,7 @@ const protectedPaths = ["/todos"];
 // Paths that are only for unauthenticated users
 const authPaths = ["/signin", "/signup"];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const sessionToken = request.cookies.get("session_token");
 
