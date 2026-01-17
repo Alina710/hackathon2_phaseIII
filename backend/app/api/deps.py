@@ -1,7 +1,7 @@
 """API dependencies and exception handlers."""
 
 from typing import Optional
-from fastapi import Request, HTTPException, Depends, Cookie
+from fastapi import Request, HTTPException, Depends, Cookie, Header
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from sqlmodel import Session
@@ -17,13 +17,22 @@ SESSION_COOKIE_NAME = "session_token"
 def get_current_user(
     session: Session = Depends(get_session),
     session_token: Optional[str] = Cookie(None, alias=SESSION_COOKIE_NAME),
+    authorization: Optional[str] = Header(None),
 ) -> User:
-    """Get current authenticated user from session cookie."""
-    if not session_token:
+    """Get current authenticated user from session cookie or Authorization header."""
+    # Try Authorization header first (Bearer token)
+    token = None
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split(" ")[1]
+    # Fall back to session cookie
+    elif session_token:
+        token = session_token
+
+    if not token:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
     auth_service = AuthService(session)
-    user = auth_service.get_session(session_token)
+    user = auth_service.get_session(token)
 
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")

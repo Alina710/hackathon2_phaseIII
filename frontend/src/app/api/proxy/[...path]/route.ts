@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000";
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
 export async function GET(
   request: NextRequest,
@@ -42,7 +42,7 @@ async function proxyRequest(
   params: { path: string[] }
 ) {
   const path = params.path.join("/");
-  const url = `${BACKEND_URL}/api/v1/${path}`;
+  const url = `${BACKEND_URL}/${path}`;
 
   // Get request body if present
   let body: string | undefined;
@@ -57,12 +57,16 @@ async function proxyRequest(
   // Forward cookies from the incoming request
   const cookieHeader = request.headers.get("cookie");
 
+  // Forward Authorization header if present
+  const authHeader = request.headers.get("Authorization");
+
   // Make request to backend
   const response = await fetch(url, {
     method: request.method,
     headers: {
       "Content-Type": "application/json",
       ...(cookieHeader ? { Cookie: cookieHeader } : {}),
+      ...(authHeader ? { Authorization: authHeader } : {}),
     },
     body: body || undefined,
   });
