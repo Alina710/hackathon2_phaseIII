@@ -21,6 +21,10 @@ class Settings(BaseSettings):
     app_name: str = "Todo API"
     debug: bool = False
 
+    # Groq settings (free AI API)
+    groq_api_key: str = ""
+    groq_model: str = "llama-3.3-70b-versatile"
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

@@ -37,8 +37,47 @@ async function fetchApi<T>(
   });
 
   if (!response.ok) {
-    const errorData = (await response.json()) as ApiError;
-    throw new ApiClientError(errorData.error, response.status);
+    let errorBody: ApiError["error"];
+
+    try {
+      const errorData = await response.json();
+
+      // Handle standard API error format: { error: { code, message } }
+      if (errorData.error && typeof errorData.error === 'object') {
+        errorBody = errorData.error;
+      }
+      // Handle FastAPI HTTPException format: { detail: "message" }
+      else if (errorData.detail) {
+        errorBody = {
+          code: `HTTP_${response.status}`,
+          message: typeof errorData.detail === 'string'
+            ? errorData.detail
+            : JSON.stringify(errorData.detail),
+        };
+      }
+      // Handle plain message format: { message: "..." }
+      else if (errorData.message) {
+        errorBody = {
+          code: `HTTP_${response.status}`,
+          message: errorData.message,
+        };
+      }
+      // Fallback for unknown formats
+      else {
+        errorBody = {
+          code: `HTTP_${response.status}`,
+          message: JSON.stringify(errorData) || 'An error occurred',
+        };
+      }
+    } catch {
+      // JSON parsing failed
+      errorBody = {
+        code: `HTTP_${response.status}`,
+        message: response.statusText || 'An error occurred',
+      };
+    }
+
+    throw new ApiClientError(errorBody, response.status);
   }
 
   return response.json() as Promise<T>;

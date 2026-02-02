@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // Paths that require authentication
-const protectedPaths = ["/todos"];
+const protectedPaths = ["/todos", "/chat"];
 
 // Paths that are only for unauthenticated users
 const authPaths = ["/signin", "/signup"];

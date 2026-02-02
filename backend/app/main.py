@@ -45,7 +45,7 @@ app.include_router(api_v1_router)
 def on_startup():
     """Initialize database tables on startup."""
     # Import models to register them with SQLModel
-    from app.models import User, Todo  # noqa: F401
+    from app.models import User, Todo, Conversation, Message  # noqa: F401
     init_db()
 
 

@@ -1,12 +1,16 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version change: 1.0.0 → 1.1.0 (MINOR: Phase II technology matrix expansion)
+Version change: 1.1.0 → 1.2.0 (MINOR: Phase III technology stack specification)
 Modified principles:
-  - IV. Technology Constraints → expanded with phase-specific technology matrix
+  - IV. Technology Constraints → expanded Phase III section with full technology matrix
+Modified sections:
+  - Phase III definition updated to reflect stateless AI chatbot architecture
+  - Phase-Specific Technology Matrix table updated with Phase III details
+  - Detailed Technology Stack table updated
 Added sections:
-  - Phase-Specific Technology Matrix (detailed breakdown by phase)
-  - Phase II Technology Details (Backend, Database, Frontend, Authentication)
+  - Phase III: Stateless AI Chatbot Application (detailed technology breakdown)
+  - Phase-specific prohibition rules (AI agents, MCP tools timing)
 Removed sections: None
 Templates requiring updates:
   - .specify/templates/plan-template.md ✅ (compatible, references Constitution Check)
@@ -74,7 +78,7 @@ immutable boundaries defined by its specification.
 **Phase Definitions**:
 - **Phase I**: Foundation - In-memory console application ONLY (no persistence, no web, no auth)
 - **Phase II**: Full-Stack Web - Python REST API, Neon PostgreSQL, Next.js frontend, Better Auth
-- **Phase III**: Intelligence - AI agents, natural language processing
+- **Phase III**: Intelligence - Stateless AI chatbot with MCP tools, OpenAI Agents SDK, ChatKit UI
 - **Phase IV**: Distribution - Multi-service architecture, event-driven
 - **Phase V**: Scale - Kubernetes orchestration, observability, multi-tenancy
 
@@ -115,6 +119,8 @@ Deviations require an approved ADR (Architecture Decision Record) and constituti
 - Web frontends (React, Next.js, etc.)
 - Authentication systems
 - External APIs
+- AI/ML frameworks
+- Agent frameworks
 
 **Rationale**: Phase I establishes core todo logic in isolation before adding infrastructure.
 
@@ -151,30 +157,98 @@ Deviations require an approved ADR (Architecture Decision Record) and constituti
 
 **Prohibited Until Phase III**:
 - AI/ML frameworks (OpenAI SDK, LangChain, etc.)
-- Agent frameworks (AutoGPT, CrewAI, etc.)
+- Agent frameworks (AutoGPT, CrewAI, OpenAI Agents SDK, etc.)
 - Natural language processing
 - Model Context Protocol (MCP)
+- MCP servers and tools
+- Conversational UI frameworks
 
 **Rationale**: Phase II adds proper persistence and web interface while deferring AI capabilities.
 
-#### Phase III+: Intelligence, Distribution, Scale
+#### Phase III: Stateless AI Chatbot Application
 
-**AI/Agents (Phase III)**:
+**Frontend**:
+- Framework: OpenAI ChatKit (conversational UI)
+- Purpose: Natural language interface for todo management
+
+**Backend**:
+- Language: Python 3.11+
+- Framework: FastAPI (Python REST API)
+- Architecture: **Stateless** - no in-memory conversation state
+
+**AI Framework**:
 - SDK: OpenAI Agents SDK
-- Protocol: Model Context Protocol (MCP)
-- Tool Framework: Function calling with structured outputs
+- Model: OpenAI GPT models via API
+- Pattern: Function calling with structured outputs
 
-**Infrastructure (Phase IV)**:
+**Tool Protocol**:
+- Protocol: Model Context Protocol (MCP)
+- Implementation: Official MCP SDK
+- Tools: Todo operations exposed as MCP tools
+
+**Persistence**:
+- Provider: Neon Serverless PostgreSQL
+- State: Conversation history MUST persist in database
+- Requirement: All state externalized to database
+
+**Authentication**:
+- Provider: Better Auth (JWT-based)
+- Security: Token-based authentication for API access
+
+**Allowed Starting Phase III**:
+- OpenAI Agents SDK
+- Model Context Protocol (MCP)
+- MCP servers and tools
+- OpenAI ChatKit UI
+- Natural language processing
+- AI-powered todo operations
+- Conversation persistence
+
+**Prohibited Until Phase IV**:
+- Kubernetes orchestration
+- Apache Kafka messaging
+- Dapr sidecar runtime
+- Cloud orchestration platforms
+- Multi-service deployment
+- Event-driven architecture patterns
+
+**Mandatory Phase III Constraints**:
+- Server MUST be stateless (no in-memory conversation state)
+- All conversation state MUST persist in Neon PostgreSQL
+- MCP tools MUST NOT maintain internal state between requests
+- Each request MUST be self-contained with context from database
+
+**Rationale**: Phase III introduces AI capabilities with stateless architecture to ensure
+horizontal scalability and clean separation between conversation UI and backend services.
+
+#### Phase IV: Distributed Architecture
+
+**Infrastructure**:
 - Containerization: Docker
 - Messaging: Apache Kafka
 - Sidecar Runtime: Dapr
+- Service Mesh: Multi-service communication
 
-**Orchestration (Phase V)**:
-- Orchestration: Kubernetes
+**Prohibited Until Phase V**:
+- Kubernetes orchestration
+- OpenTelemetry observability
+- Multi-tenancy
+- Namespace isolation
+
+**Rationale**: Phase IV introduces distribution patterns while deferring orchestration complexity.
+
+#### Phase V: Kubernetes Scale
+
+**Orchestration**:
+- Platform: Kubernetes
 - Observability: OpenTelemetry
 - Multi-tenancy: Namespace isolation
+- Scaling: Horizontal pod autoscaling
 
-**Non-Negotiable Constraints (All Phases)**:
+**Rationale**: Phase V completes the evolution with full cloud-native orchestration.
+
+#### Non-Negotiable Constraints (All Phases)
+
 - All services MUST be stateless (state in database or message broker only)
 - All APIs MUST be versioned (URL path versioning: /v1/, /v2/)
 - All secrets MUST use environment variables (never hardcoded)
@@ -228,9 +302,9 @@ system remains maintainable as it evolves through all five phases.
 |-------|-------------|---------|----------|----------|------|-----------|
 | I     | Console App | Python 3.11+ | In-memory | None | None | None |
 | II    | Full-Stack Web | FastAPI + SQLModel | Neon PostgreSQL | Next.js + TypeScript | Better Auth | None |
-| III   | Intelligent Web | FastAPI + SQLModel | Neon PostgreSQL | Next.js + TypeScript | Better Auth | OpenAI SDK + MCP |
-| IV    | Distributed | FastAPI + Kafka + Dapr | Neon PostgreSQL | Next.js + TypeScript | Better Auth | OpenAI SDK + MCP |
-| V     | Kubernetes Scale | FastAPI + K8s | Neon PostgreSQL | Next.js + TypeScript | Better Auth | OpenAI SDK + MCP |
+| III   | Stateless AI Chatbot | FastAPI (Stateless) | Neon PostgreSQL | OpenAI ChatKit | Better Auth (JWT) | OpenAI Agents SDK + MCP |
+| IV    | Distributed | FastAPI + Kafka + Dapr | Neon PostgreSQL | OpenAI ChatKit | Better Auth (JWT) | OpenAI Agents SDK + MCP |
+| V     | Kubernetes Scale | FastAPI + K8s | Neon PostgreSQL | OpenAI ChatKit | Better Auth (JWT) | OpenAI Agents SDK + MCP |
 
 ### Detailed Technology Stack
 
@@ -240,14 +314,25 @@ system remains maintainable as it evolves through all five phases.
 | API Framework  | FastAPI                   | II               |
 | ORM            | SQLModel                  | II               |
 | Database       | Neon PostgreSQL           | II               |
-| Frontend       | Next.js + TypeScript      | II               |
+| Frontend (Web) | Next.js + TypeScript      | II               |
+| Frontend (Chat)| OpenAI ChatKit            | III              |
 | Authentication | Better Auth               | II               |
+| Auth Protocol  | JWT-based                 | III              |
 | AI SDK         | OpenAI Agents SDK         | III              |
-| Protocol       | MCP                       | III              |
+| Tool Protocol  | MCP (Official SDK)        | III              |
 | Containers     | Docker                    | IV               |
-| Orchestration  | Kubernetes                | V                |
 | Messaging      | Apache Kafka              | IV               |
 | Sidecar        | Dapr                      | IV               |
+| Orchestration  | Kubernetes                | V                |
+
+### Phase Technology Gate Rules
+
+| Rule | Description | Enforcement |
+|------|-------------|-------------|
+| AI Gate | AI agents and OpenAI SDK PROHIBITED before Phase III | Constitution violation if used in Phase I/II |
+| MCP Gate | MCP tools and servers PROHIBITED before Phase III | Constitution violation if used in Phase I/II |
+| Stateless Gate | Stateless server architecture MANDATORY in Phase III | All conversation state must persist in database |
+| Orchestration Gate | Kubernetes, Kafka, Dapr PROHIBITED before Phase IV | Constitution violation if used in Phase I/II/III |
 
 ## Development Workflow
 
@@ -314,4 +399,4 @@ All development MUST follow this workflow without exception:
 This constitution supersedes all other project documentation in case of conflict.
 Agent instructions, team conventions, and external guidelines yield to this document.
 
-**Version**: 1.1.0 | **Ratified**: 2025-12-28 | **Last Amended**: 2025-12-29
+**Version**: 1.2.0 | **Ratified**: 2025-12-28 | **Last Amended**: 2026-01-31

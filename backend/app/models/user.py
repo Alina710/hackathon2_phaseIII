@@ -7,6 +7,7 @@ from sqlmodel import SQLModel, Field, Relationship
 
 if TYPE_CHECKING:
     from app.models.todo import Todo
+    from app.models.conversation import Conversation
 
 
 class User(SQLModel, table=True):
@@ -22,3 +23,6 @@ class User(SQLModel, table=True):
 
     # Relationship to todos
     todos: List["Todo"] = Relationship(back_populates="user")
+
+    # Relationship to conversations (Phase III)
+    conversations: List["Conversation"] = Relationship(back_populates="user")

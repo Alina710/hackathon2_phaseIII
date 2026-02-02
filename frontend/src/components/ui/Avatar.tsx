@@ -64,3 +64,18 @@ export const Avatar: React.FC<AvatarProps> = ({
     </div>
   );
 };
+
+export const AvatarFallback: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
+  className = "",
+  children,
+  ...props
+}) => {
+  return (
+    <div
+      className={`flex h-full w-full items-center justify-center rounded-full bg-muted ${className}`}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+};

@@ -35,7 +35,28 @@ export function TopNavbar({ user }: TopNavbarProps) {
             <span className="hidden font-bold text-xl text-gray-900 sm:block">TaskFlow</span>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Main Navigation */}
+          <div className="hidden items-center gap-6 md:flex flex-1 ml-8">
+            <Link
+              href="/todos"
+              className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
+            >
+              Tasks
+            </Link>
+            <Link
+              href="/chat"
+              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
+            >
+              <span className="flex h-5 w-5 items-center justify-center rounded bg-blue-100 text-blue-600">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </span>
+              AI Assistant
+            </Link>
+          </div>
+
+          {/* Desktop Profile & SignOut */}
           <div className="hidden items-center gap-4 md:flex">
             {user && (
               <div className="flex items-center gap-3">
@@ -70,6 +91,27 @@ export function TopNavbar({ user }: TopNavbarProps) {
         {/* Mobile menu */}
         {mobileMenuOpen && (
           <div className="border-t border-gray-200 py-4 md:hidden">
+            <div className="flex flex-col gap-2 px-2 pb-4 border-b border-gray-200 mb-4">
+              <Link
+                href="/todos"
+                className="px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Tasks
+              </Link>
+              <Link
+                href="/chat"
+                className="flex items-center gap-2 px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span className="flex h-5 w-5 items-center justify-center rounded bg-blue-100 text-blue-600">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </span>
+                AI Assistant
+              </Link>
+            </div>
             {user && (
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-3 px-2">
