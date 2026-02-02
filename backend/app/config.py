@@ -8,14 +8,14 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # Database
-    database_url: str
+    database_url: str = "sqlite:///./data/app.db"
 
     # Authentication
-    better_auth_secret: str
+    better_auth_secret: str = "default-secret-key-change-in-production-32chars"
     better_auth_url: str = "http://localhost:8000"
 
     # CORS
-    frontend_url: str = "http://localhost:3000"
+    frontend_url: str = "*"
 
     # App settings
     app_name: str = "Todo API"
