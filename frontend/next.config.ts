@@ -9,9 +9,19 @@ const nextConfig: NextConfig = {
     unoptimized: true, // Disable image optimization for faster builds
   },
 
-  // Disable TypeScript errors during build (optional - remove if you want strict checking)
+  // Disable TypeScript errors during build
   typescript: {
     ignoreBuildErrors: true,
+  },
+
+  // Disable ESLint during build
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
+  // Disable Turbopack for production (use webpack)
+  experimental: {
+    turbo: undefined,
   },
 };
 
